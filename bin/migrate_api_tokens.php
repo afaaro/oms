@@ -38,7 +38,7 @@ $existing = $db->query(
 
 if ($existing !== []) {
     $db->query(
-        'UPDATE store_api_tokens SET token_hash=?, token_prefix=?, tenant_id=1, scopes=?, expires_at=NULL, revoked_at=NULL WHERE id=?',
+        'UPDATE store_api_tokens SET token_hash=?, token_prefix=?, tenant_id=1, scopes=?, expires_at=DATE_ADD(NOW(), INTERVAL 30 DAY), revoked_at=NULL WHERE id=?',
         [$hash, $prefix, 'orders:read', (int) $existing['id']]
     );
     echo "rotated demo token for user #{$user['id']}\n";
