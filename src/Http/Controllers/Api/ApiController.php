@@ -67,4 +67,15 @@ abstract class ApiController extends Controller
             'pages'    => max(1, (int) ceil($total / $per)),
         ];
     }
+
+    protected function requireScope(string $scope): bool
+    {
+        if ($this->app->auth->apiTokenAllowsScope($scope)) {
+            return true;
+        }
+
+        $this->fail('Your API token does not have the required permission.', 403);
+
+        return false;
+    }
 }
