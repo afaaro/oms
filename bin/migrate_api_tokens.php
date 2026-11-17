@@ -44,8 +44,8 @@ if ($existing !== []) {
     echo "rotated demo token for user #{$user['id']}\n";
 } else {
     $db->query(
-        'INSERT INTO store_api_tokens (tenant_id, user_id, name, token_hash, token_prefix, scopes)
-         VALUES (1, ?, ?, ?, ?, ?)',
+        'INSERT INTO store_api_tokens (tenant_id, user_id, name, token_hash, token_prefix, scopes, expires_at)
+         VALUES (1, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY))',
         [(int) $user['id'], 'demo', $hash, $prefix, 'orders:read']
     );
     echo "created demo token for user #{$user['id']}\n";
