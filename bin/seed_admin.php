@@ -56,11 +56,9 @@ try {
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($existing) {
-        $uid = (int) $existing['id'];
-        $pdo->prepare(
-            'UPDATE users SET password_hash = ?, display_name = ?, status = ?, email_canonical = ? WHERE id = ?'
-        )->execute([$hash, $name, 'active', $canonical, $uid]);
-        echo "Updated user #{$uid} ({$email})\n";
+        throw new RuntimeException(
+            "User already exists: {$email}. No changes were made."
+        );
     } else {
         $pdo->prepare(
             'INSERT INTO users (email, email_canonical, username, password_hash, display_name, status, email_verified)
