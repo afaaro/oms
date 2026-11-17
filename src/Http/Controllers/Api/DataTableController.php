@@ -61,7 +61,7 @@ final class DataTableController extends Controller
 
     public function products(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -87,7 +87,7 @@ final class DataTableController extends Controller
 
     public function productVariants(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $parentId = (int) $this->app->request->get('parent_id', 0);
@@ -152,7 +152,7 @@ final class DataTableController extends Controller
 
     public function customers(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('customers:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -175,7 +175,7 @@ final class DataTableController extends Controller
 
     public function users(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('users:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -201,7 +201,7 @@ final class DataTableController extends Controller
 
     public function channels(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('channels:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -224,7 +224,7 @@ final class DataTableController extends Controller
 
     public function warehouses(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('warehouse:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -309,7 +309,7 @@ final class DataTableController extends Controller
 
     public function suppliers(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -331,7 +331,7 @@ final class DataTableController extends Controller
 
     public function purchaseOrders(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -353,7 +353,7 @@ final class DataTableController extends Controller
 
     public function categories(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -372,7 +372,7 @@ final class DataTableController extends Controller
 
     public function attributes(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -396,7 +396,7 @@ final class DataTableController extends Controller
 
     public function stockLocations(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -415,7 +415,7 @@ final class DataTableController extends Controller
 
     public function returns(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('warehouse:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -449,7 +449,7 @@ final class DataTableController extends Controller
 
     public function shipments(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('shipping:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -568,7 +568,7 @@ final class DataTableController extends Controller
 
     public function dropships(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('warehouse:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -643,7 +643,7 @@ final class DataTableController extends Controller
 
     public function reportJobs(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('reports:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -665,7 +665,7 @@ final class DataTableController extends Controller
 
     public function shippingMethods(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('shipping:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -685,7 +685,7 @@ final class DataTableController extends Controller
 
     public function shippingRegions(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('shipping:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -704,7 +704,7 @@ final class DataTableController extends Controller
 
     public function shippingRules(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('shipping:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
@@ -730,7 +730,7 @@ final class DataTableController extends Controller
 
     public function listings(): void
     {
-        if (!$this->requireScope('orders:read')) {
+        if (!$this->requireScope('catalog:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
