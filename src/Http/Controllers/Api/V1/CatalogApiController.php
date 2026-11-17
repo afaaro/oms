@@ -34,6 +34,9 @@ final class CatalogApiController extends ApiController
 
     public function productShow(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $product = $this->app->db->query(
             'SELECT * FROM #__store_products WHERE id = ? AND tenant_id = ? LIMIT 1',
@@ -121,6 +124,9 @@ final class CatalogApiController extends ApiController
 
     public function inventory(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $params = [$this->tenantId()];
         $where = 'i.tenant_id = ?';
         $sku = trim((string) $this->app->request->get('sku', ''));
@@ -179,6 +185,9 @@ final class CatalogApiController extends ApiController
 
     public function listings(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $params = [$this->tenantId()];
         $where = 'l.tenant_id = ?';
         $view = (string) $this->app->request->get('view', 'all');
@@ -218,6 +227,9 @@ final class CatalogApiController extends ApiController
 
     public function categories(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, name, parent_id, active, created_at FROM #__store_categories WHERE tenant_id = ? ORDER BY name',
             [$this->tenantId()]
@@ -227,6 +239,9 @@ final class CatalogApiController extends ApiController
 
     public function suppliers(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, name, code, email, phone, active FROM #__store_suppliers WHERE tenant_id = ? ORDER BY name',
             [$this->tenantId()]
@@ -236,6 +251,9 @@ final class CatalogApiController extends ApiController
 
     public function purchaseOrders(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT po.id, po.reference, po.status, po.total, po.expected_at, s.name AS supplier_name
              FROM #__store_purchase_orders po
