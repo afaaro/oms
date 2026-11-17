@@ -10,6 +10,9 @@ final class WarehouseApiController extends ApiController
 {
     public function warehouses(): void
     {
+        if (!$this->requireScope('warehouse:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, code, name, is_default, active, created_at
              FROM #__store_warehouses WHERE tenant_id = ? ORDER BY is_default DESC, name',
@@ -20,6 +23,9 @@ final class WarehouseApiController extends ApiController
 
     public function locations(): void
     {
+        if (!$this->requireScope('warehouse:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, code, name, warehouse_id, active FROM #__store_stock_locations WHERE tenant_id = ? ORDER BY code',
             [$this->tenantId()]
@@ -29,6 +35,9 @@ final class WarehouseApiController extends ApiController
 
     public function pickwaveCreate(): void
     {
+        if (!$this->requireScope('warehouse:manage')) {
+            return;
+        }
         $ids = $this->app->request->input('order_ids', []);
         if (!is_array($ids)) {
             $ids = [];
@@ -52,6 +61,9 @@ final class WarehouseApiController extends ApiController
 
     public function returns(): void
     {
+        if (!$this->requireScope('warehouse:read')) {
+            return;
+        }
         $params = [$this->tenantId()];
         $where = 'r.tenant_id = ?';
         $status = trim((string) $this->app->request->get('status', ''));
@@ -76,6 +88,9 @@ final class WarehouseApiController extends ApiController
 
     public function returnShow(): void
     {
+        if (!$this->requireScope('warehouse:read')) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $row = $this->app->db->query(
             'SELECT r.*, o.buyer_email, o.status AS order_status
@@ -93,6 +108,9 @@ final class WarehouseApiController extends ApiController
 
     public function returnUpdateStatus(): void
     {
+        if (!$this->requireScope('warehouse:manage')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $status = (string) $this->app->request->input('status', '');
         $allowed = ['pending', 'requested', 'received', 'inspecting', 'refunded', 'rejected', 'closed'];
@@ -109,6 +127,9 @@ final class WarehouseApiController extends ApiController
 
     public function dropships(): void
     {
+        if (!$this->requireScope('warehouse:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT d.id, d.reference, d.status, d.order_id, d.supplier_id, d.created_at, s.name AS supplier_name
              FROM #__store_dropships d
