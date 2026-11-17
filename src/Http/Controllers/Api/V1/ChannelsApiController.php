@@ -386,13 +386,16 @@ final class ChannelsApiController extends ApiController
         ]);
     }
 
-    private function canManageChannels(): bool
+    private function canManageChannels(string $scope = 'channels:manage'): bool
     {
-        if ($this->app->auth->canPage('page.settings.channels')) {
+        if (
+            $this->app->auth->canPage('page.settings.channels')
+            && $this->app->auth->apiTokenAllowsScope($scope)
+        ) {
             return true;
         }
 
-        $this->fail('You do not have permission to manage integrations.', 403);
+        $this->fail('You do not have permission to access integrations.', 403);
 
         return false;
     }
