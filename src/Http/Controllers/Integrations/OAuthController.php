@@ -43,6 +43,11 @@ final class OAuthController extends Controller
             return;
         }
 
+        if (!$this->app->auth->canPage('page.settings.channels')) {
+            $this->failAndRedirect('You do not have permission to manage integrations.');
+            return;
+        }
+
         if ($tenantId > 0) {
             $this->app->tenant->setActive($tenantId);
         }
