@@ -12,9 +12,25 @@ require dirname(__DIR__) . '/bootstrap/autoload.php';
 $base = dirname(__DIR__);
 $config = require $base . '/config/database.php';
 
-$email = $argv[1] ?? 'admin@storefeeder.local';
-$password = $argv[2] ?? 'admin123';
-$name = $argv[3] ?? 'Admin';
+
+$email = trim($argv[1] ?? '');
+$password = $argv[2] ?? '';
+$name = trim($argv[3] ?? 'Admin');
+
+if (
+    $email === ''
+    || !filter_var($email, FILTER_VALIDATE_EMAIL)
+    || $password === ''
+    || strlen($password) < 12
+) {
+    fwrite(
+        STDERR,
+        "Usage: php bin/seed_admin.php <email> <password> [name]\n"
+        . "Password must be at least 12 characters.\n"
+    );
+    exit(1);
+}
+
 $username = strstr($email, '@', true) ?: 'admin';
 
 $host = $config['hostname'] ?? 'localhost';
