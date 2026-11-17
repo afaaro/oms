@@ -10,6 +10,9 @@ final class CustomersApiController extends ApiController
 {
     public function index(): void
     {
+        if (!$this->requireScope('customers:read')) {
+            return;
+        }
         $params = [$this->tenantId()];
         $where = 'tenant_id = ?';
         $q = trim((string) $this->app->request->get('q', ''));
@@ -30,6 +33,9 @@ final class CustomersApiController extends ApiController
 
     public function show(): void
     {
+        if (!$this->requireScope('customers:read')) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $customer = $this->app->db->query(
             'SELECT * FROM #__store_customers WHERE id = ? AND tenant_id = ? LIMIT 1',
@@ -51,6 +57,9 @@ final class CustomersApiController extends ApiController
 
     public function store(): void
     {
+        if (!$this->requireScope('customers:write')) {
+            return;
+        }
         $email = trim((string) $this->app->request->input('email', ''));
         $name = trim((string) $this->app->request->input('name', ''));
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -77,6 +86,9 @@ final class CustomersApiController extends ApiController
 
     public function update(): void
     {
+        if (!$this->requireScope('customers:write')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         if ($id <= 0) {
             $this->fail('id required', 422);
