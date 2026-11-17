@@ -32,6 +32,9 @@ final class DataTableController extends Controller
 {
     public function orders(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $withSelect = ($req->filters['select'] ?? '') === '1';
         // Checkbox column shifts DataTables order index by 1 vs SQL columns.
@@ -58,6 +61,9 @@ final class DataTableController extends Controller
 
     public function products(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         try {
             $result = (new ProductsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
@@ -81,6 +87,9 @@ final class DataTableController extends Controller
 
     public function productVariants(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $parentId = (int) $this->app->request->get('parent_id', 0);
         $rows = (new ProductsDataset($this->app->db))->variantsForParent($this->app->tenant->id(), $parentId);
         $viewBase = $this->app->url('admin/products/view');
@@ -143,6 +152,9 @@ final class DataTableController extends Controller
 
     public function customers(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new CustomersDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $viewBase = $this->app->url('admin/customers/view');
@@ -163,6 +175,9 @@ final class DataTableController extends Controller
 
     public function users(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $tenantId = $this->app->tenant->id();
         $result = (new UsersDataset($this->app->db))->forDataTable($tenantId, $req);
@@ -186,6 +201,9 @@ final class DataTableController extends Controller
 
     public function channels(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ChannelsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $editBase = $this->app->url('admin/settings/channels/edit');
@@ -206,6 +224,9 @@ final class DataTableController extends Controller
 
     public function warehouses(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new WarehousesDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -288,6 +309,9 @@ final class DataTableController extends Controller
 
     public function suppliers(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new SuppliersDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $editBase = $this->e($this->app->url('admin/suppliers/edit'));
@@ -307,6 +331,9 @@ final class DataTableController extends Controller
 
     public function purchaseOrders(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new PurchaseOrdersDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $viewBase = $this->e($this->app->url('admin/purchase-orders/view'));
@@ -326,6 +353,9 @@ final class DataTableController extends Controller
 
     public function categories(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new CategoriesDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -342,6 +372,9 @@ final class DataTableController extends Controller
 
     public function attributes(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new AttributesDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $editBase = $this->e($this->app->url('admin/attributes/edit'));
@@ -363,6 +396,9 @@ final class DataTableController extends Controller
 
     public function stockLocations(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new StockLocationsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -379,6 +415,9 @@ final class DataTableController extends Controller
 
     public function returns(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ReturnsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $orderBase = $this->app->url('admin/orders/view');
@@ -410,6 +449,9 @@ final class DataTableController extends Controller
 
     public function shipments(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $withSelect = ($req->filters['select'] ?? '') === '1';
         if ($withSelect && $req->orderColumn > 0) {
@@ -526,6 +568,9 @@ final class DataTableController extends Controller
 
     public function dropships(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new DropshipsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $orderBase = $this->app->url('admin/orders/view');
@@ -598,6 +643,9 @@ final class DataTableController extends Controller
 
     public function reportJobs(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $type = (string) ($req->filters['type'] ?? '');
         $result = (new ReportJobsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req, $type);
@@ -617,6 +665,9 @@ final class DataTableController extends Controller
 
     public function shippingMethods(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ShippingMethodsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -634,6 +685,9 @@ final class DataTableController extends Controller
 
     public function shippingRegions(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ShippingRegionsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -650,6 +704,9 @@ final class DataTableController extends Controller
 
     public function shippingRules(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ShippingRulesDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $data = [];
@@ -673,6 +730,9 @@ final class DataTableController extends Controller
 
     public function listings(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $req = new DataTableRequest($this->app->request);
         $result = (new ListingsDataset($this->app->db))->forDataTable($this->app->tenant->id(), $req);
         $mapBase = $this->app->url('admin/listings/map');
@@ -989,5 +1049,20 @@ final class DataTableController extends Controller
     {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+    }
+
+    private function requireScope(string $scope): bool
+    {
+        if ($this->app->auth->apiTokenAllowsScope($scope)) {
+            return true;
+        }
+
+        http_response_code(403);
+        $this->json([
+            'ok' => false,
+            'error' => 'Your API token does not have the required permission.',
+        ]);
+
+        return false;
     }
 }
