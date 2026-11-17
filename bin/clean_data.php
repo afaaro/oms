@@ -78,8 +78,22 @@ $pdo->exec(
 );
 
 // Platform admin (can open Platform + Open as tenant)
-$email = 'admin@storefeeder.local';
-$password = 'admin123';
+$email = trim($argv[1] ?? '');
+$password = $argv[2] ?? '';
+
+if (
+    $email === ''
+    || !filter_var($email, FILTER_VALIDATE_EMAIL)
+    || strlen($password) < 12
+) {
+    fwrite(
+        STDERR,
+        "Usage: php bin/clean_data.php <email> <password>\n"
+        . "Password must be at least 12 characters.\n"
+    );
+    exit(1);
+}
+
 $hash = password_hash($password, PASSWORD_DEFAULT);
 $hasPlatform = (bool) $pdo->query("SHOW COLUMNS FROM users LIKE 'is_platform'")->fetch();
 if ($hasPlatform) {
@@ -96,10 +110,6 @@ if ($hasPlatform) {
     $stmt->execute([$email, strtolower($email), 'admin', $hash, 'Platform Admin', 'active']);
 }
 $uid = (int) $pdo->lastInsertId();
-
-foreach ([2, 3] as $gid) {
-    $pdo->prepare('INSERT IGNORE INTO user_group_members (user_id, group_id) VALUES (?, ?)')->execute([$uid, $gid]);
-}
 
 $pdo->prepare(
     'INSERT INTO store_tenant_users (tenant_id, user_id, role, flags) VALUES (1, ?, ?, ?)'
@@ -123,4 +133,4 @@ if (is_dir($rateDir)) {
 }
 
 echo "\nDone. Database is empty except Default tenant.\n";
-echo "Login: {$email} / {$password}\n";
+echo "Login email: {$email}\n";
