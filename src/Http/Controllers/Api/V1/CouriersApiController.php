@@ -17,12 +17,18 @@ final class CouriersApiController extends ApiController
 {
     public function index(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $_GET['type'] = 'courier';
         (new ChannelsApiController($this->app))->index();
     }
 
     public function royalMailAuthInfo(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $this->authInfo('royal_mail', 'Royal Mail Auth API', 'client_credentials', RoyalMailConnector::TOKEN_URL, RoyalMailConnector::API_BASE, [
             'GET  /api/v1/couriers/royal-mail/auth' => 'This help',
             'POST /api/v1/couriers/royal-mail/auth' => 'Issue access_token',
@@ -32,16 +38,25 @@ final class CouriersApiController extends ApiController
 
     public function royalMailAuth(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runAuth('royal_mail', new RoyalMailConnector($this->app));
     }
 
     public function royalMailTest(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runTest('royal_mail', new RoyalMailConnector($this->app));
     }
 
     public function evriAuthInfo(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $this->authInfo('evri', 'Evri Auth API', 'client_credentials', EvriConnector::TOKEN_URL, EvriConnector::API_BASE, [
             'GET  /api/v1/couriers/evri/auth' => 'This help',
             'POST /api/v1/couriers/evri/auth' => 'Issue access_token',
@@ -51,16 +66,25 @@ final class CouriersApiController extends ApiController
 
     public function evriAuth(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runAuth('evri', new EvriConnector($this->app));
     }
 
     public function evriTest(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runTest('evri', new EvriConnector($this->app));
     }
 
     public function parcelforceAuthInfo(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $this->authInfo('parcelforce', 'ParcelForce ExpressLink Auth API', 'expresslink_soap', ParcelForceConnector::WSDL_HINT, ParcelForceConnector::TEST_HINT, [
             'GET  /api/v1/couriers/parcelforce/auth' => 'This help',
             'POST /api/v1/couriers/parcelforce/auth' => 'Validate & store ExpressLink username/password',
@@ -70,16 +94,25 @@ final class CouriersApiController extends ApiController
 
     public function parcelforceAuth(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runAuth('parcelforce', new ParcelForceConnector($this->app));
     }
 
     public function parcelforceTest(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runTest('parcelforce', new ParcelForceConnector($this->app));
     }
 
     public function dpdAuthInfo(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $this->authInfo('dpd', 'DPD Auth API', 'basic_login_geosession', DpdConnector::LOGIN_URL, DpdConnector::API_BASE, [
             'GET  /api/v1/couriers/dpd/auth' => 'This help',
             'POST /api/v1/couriers/dpd/auth' => 'Login — issue geoSession',
@@ -89,11 +122,17 @@ final class CouriersApiController extends ApiController
 
     public function dpdAuth(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runAuth('dpd', new DpdConnector($this->app));
     }
 
     public function dpdTest(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $this->runTest('dpd', new DpdConnector($this->app));
     }
 
