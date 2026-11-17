@@ -69,7 +69,7 @@ try {
     }
 
     // Ensure admin group membership (id 2 = admin, 3 = sadmin)
-    foreach ([2, 3] as $gid) {
+    foreach ([2] as $gid) {
         $pdo->prepare(
             'INSERT IGNORE INTO user_group_members (user_id, group_id) VALUES (?, ?)'
         )->execute([$uid, $gid]);
@@ -87,4 +87,5 @@ try {
     exit(1);
 }
 
-echo "Login: {$email} / {$password}\n";
+echo "Admin account created successfully.\n";
+echo "Login email: {$email}\n";
