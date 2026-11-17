@@ -396,7 +396,7 @@ final class DataTableController extends Controller
 
     public function stockLocations(): void
     {
-        if (!$this->requireScope('catalog:read')) {
+        if (!$this->requireScope('warehouse:read')) {
             return;
         }
         $req = new DataTableRequest($this->app->request);
