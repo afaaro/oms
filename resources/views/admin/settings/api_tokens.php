@@ -33,6 +33,27 @@
     <label>Name
       <input type="text" name="name" value="api" maxlength="128" required>
     </label>
+
+    <label>Scopes (hold Ctrl to select multiple)
+      <select name="scopes[]" multiple required>
+        <option value="orders:read">Orders — Read</option>
+        <option value="orders:write">Orders — Write</option>
+        <option value="catalog:read">Catalog — Read</option>
+        <option value="catalog:write">Catalog — Write</option>
+        <option value="customers:read">Customers — Read</option>
+        <option value="customers:write">Customers — Write</option>
+        <option value="users:read">Users — Read</option>
+        <option value="channels:read">Channels — Read</option>
+        <option value="channels:manage">Channels — Manage</option>
+        <option value="warehouse:read">Warehouse — Read</option>
+        <option value="warehouse:manage">Warehouse — Manage</option>
+        <option value="shipping:read">Shipping — Read</option>
+        <option value="shipping:manage">Shipping — Manage</option>
+        <option value="reports:read">Reports — Read</option>
+        <option value="messages:read">Messages — Read</option>
+        <option value="messages:manage">Messages — Manage</option>
+      </select>
+    </label>
     <button type="submit" class="btn btn-primary">Issue token</button>
   </form>
   <p class="text-muted" style="margin:.75rem 0 0;">
