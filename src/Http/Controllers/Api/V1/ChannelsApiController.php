@@ -355,6 +355,17 @@ final class ChannelsApiController extends ApiController
         ]);
     }
 
+    private function canManageChannels(): bool
+    {
+        if ($this->app->auth->canPage('page.settings.channels')) {
+            return true;
+        }
+
+        $this->fail('You do not have permission to manage integrations.', 403);
+
+        return false;
+    }
+
     /** @return array<string, string> */
     private function decodeSettings(mixed $raw): array
     {
