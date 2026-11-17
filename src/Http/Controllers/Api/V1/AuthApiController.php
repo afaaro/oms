@@ -20,6 +20,32 @@ final class AuthApiController extends ApiController
         $username = trim((string) $this->app->request->input('username', $this->app->request->input('email', '')));
         $password = (string) $this->app->request->input('password', '');
         $name = trim((string) $this->app->request->input('name', 'api'));
+
+        $scopesInput = trim((string) $this->app->request->input('scopes', ''));
+
+        $allowedScopes = [
+            'orders:read', 'orders:write',
+            'catalog:read', 'catalog:write',
+            'customers:read', 'customers:write',
+            'users:read',
+            'channels:read', 'channels:manage',
+            'warehouse:read', 'warehouse:manage',
+            'shipping:read', 'shipping:manage',
+            'reports:read',
+            'messages:read', 'messages:manage',
+        ];
+
+        $scopes = array_values(array_unique(array_filter(
+            array_map('trim', explode(',', $scopesInput))
+        )));
+
+        if ($scopes === [] || array_diff($scopes, $allowedScopes) !== []) {
+            $this->fail('Valid API token scopes are required.', 422);
+            return;
+        }
+
+        $scopesString = implode(',', $scopes);
+
         if ($username === '' || $password === '') {
             $this->fail('username and password are required', 422);
             return;
@@ -46,7 +72,12 @@ final class AuthApiController extends ApiController
         }
 
         $this->app->security->clearAttempts('api_token');
-        $token = $this->app->auth->issueApiToken((int) $user['id'], $tenantId, $name !== '' ? $name : 'api');
+        $token = $this->app->auth->issueApiToken(
+            (int) $user['id'],
+            $tenantId,
+            $name !== '' ? $name : 'api',
+            $scopesString
+        );
         $this->ok([
             'token'      => $token,
             'token_type' => 'Bearer',
