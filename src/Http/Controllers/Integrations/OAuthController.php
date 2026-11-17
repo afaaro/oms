@@ -92,32 +92,44 @@ final class OAuthController extends Controller
     /** @return array<string, mixed>|null */
     private function decodeState(string $state): ?array
     {
-        if ($state === '') {
+        if ($state === '' || preg_match('/^[a-f0-9]{64}$/D', $state) !== 1) {
             return null;
         }
-        $expected = (string) $this->app->session->get('oauth_state', '');
 
-        $b64 = strtr($state, '-_', '+/');
-        $pad = strlen($b64) % 4;
-        if ($pad > 0) {
-            $b64 .= str_repeat('=', 4 - $pad);
-        }
-        $raw = base64_decode($b64, true);
-        if ($raw === false) {
+        $expected = $this->app->session->get('oauth_state');
+
+        if (
+            !is_string($expected)
+            || $expected === ''
+            || !hash_equals($expected, $state)
+        ) {
             return null;
         }
-        $data = json_decode($raw, true);
-        if (!is_array($data) || empty($data['channel_id']) || empty($data['nonce'])) {
+
+        $data = $this->app->session->get('oauth_state_payload');
+
+        if (!is_array($data)) {
             return null;
         }
-        // Prefer session match when present; still accept packed-expiry state after marketplace redirect
-        // when the session cookie was dropped (cross-site) but state is unexpired.
-        if ($expected !== '' && !hash_equals($expected, $state)) {
+
+        // Consume the state immediately to prevent replay.
+        $this->app->session->remove('oauth_state');
+        $this->app->session->remove('oauth_state_payload');
+
+        $channelId = (int) ($data['channel_id'] ?? 0);
+        $tenantId = (int) ($data['tenant_id'] ?? 0);
+        $provider = (string) ($data['provider'] ?? '');
+        $expiresAt = (int) ($data['exp'] ?? 0);
+
+        if (
+            $channelId < 1
+            || $tenantId < 1
+            || $provider === ''
+            || $expiresAt <= time()
+        ) {
             return null;
         }
-        if (!empty($data['exp']) && (int) $data['exp'] < time()) {
-            return null;
-        }
+
         return $data;
     }
 
