@@ -117,7 +117,7 @@ final class ChannelsApiController extends ApiController
 
     public function connect(): void
     {
-        if (!$this->canManageChannels('channels:read')) {
+        if (!$this->canManageChannels()) {
             return;
         }
         $id = (int) $this->app->request->input('id', 0);
@@ -223,7 +223,7 @@ final class ChannelsApiController extends ApiController
 
     public function unlink(): void
     {
-        if (!$this->canManageChannels('channels:read')) {
+        if (!$this->canManageChannels()) {
             return;
         }
         $id = (int) $this->app->request->input('id', 0);
@@ -250,7 +250,7 @@ final class ChannelsApiController extends ApiController
     public function toggle(): void
     {
 
-        if (!$this->canManageChannels('channels:read')) {
+        if (!$this->canManageChannels()) {
             return;
         }
 
@@ -275,7 +275,7 @@ final class ChannelsApiController extends ApiController
     public function test(): void
     {
 
-        if (!$this->canManageChannels('channels:read')) {
+        if (!$this->canManageChannels()) {
             return;
         }
         $id = (int) $this->app->request->input('id', 0);
@@ -312,7 +312,7 @@ final class ChannelsApiController extends ApiController
     public function sync(): void
     {
 
-        if (!$this->canManageChannels('channels:read')) {
+        if (!$this->canManageChannels()) {
             return;
         }
         $id = (int) $this->app->request->input('id', 0);
