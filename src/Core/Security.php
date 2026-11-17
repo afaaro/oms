@@ -30,8 +30,15 @@ final class Security
         if (!$force || $this->isHttps()) {
             return;
         }
-        $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $baseUrl = (string) $this->app->config->get('app.url', '');
+        $host = parse_url($baseUrl, PHP_URL_HOST);
+
+        if (!is_string($host) || $host === '') {
+            throw new \RuntimeException('A valid app.url must be configured for HTTPS enforcement.');
+        }
+
         $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+
         header('Location: https://' . $host . $uri, true, 301);
         exit;
     }
