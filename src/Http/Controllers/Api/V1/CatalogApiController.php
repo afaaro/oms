@@ -10,6 +10,9 @@ final class CatalogApiController extends ApiController
 {
     public function products(): void
     {
+        if (!$this->requireScope('catalog:read')) {
+            return;
+        }
         $tenantId = $this->tenantId();
         $params = [$tenantId];
         $where = 'p.tenant_id = ?';
