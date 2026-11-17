@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `store_api_tokens` (
   `name` varchar(128) NOT NULL DEFAULT 'default',
   `token_hash` char(64) NOT NULL,
   `token_prefix` varchar(16) NOT NULL DEFAULT '',
-  `scopes` varchar(255) NOT NULL DEFAULT '*',
+  `scopes` varchar(255) NOT NULL DEFAULT '',
   `last_used_at` datetime DEFAULT NULL,
   `expires_at` datetime DEFAULT NULL,
   `revoked_at` datetime DEFAULT NULL,
