@@ -68,12 +68,8 @@ try {
         echo "Created user #{$uid} ({$email})\n";
     }
 
-    // Ensure admin group membership (id 2 = admin, 3 = sadmin)
-    foreach ([2] as $gid) {
-        $pdo->prepare(
-            'INSERT IGNORE INTO user_group_members (user_id, group_id) VALUES (?, ?)'
-        )->execute([$uid, $gid]);
-    }
+    // Tenant permissions are managed through store_tenant_users.
+    // Do not assign legacy global administrator groups here.
 
     $pdo->prepare(
         'INSERT IGNORE INTO store_tenant_users (tenant_id, user_id, role, flags)
