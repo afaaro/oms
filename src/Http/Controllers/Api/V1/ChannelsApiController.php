@@ -211,6 +211,9 @@ final class ChannelsApiController extends ApiController
 
     public function unlink(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $channel = $this->app->db->query(
             'SELECT settings FROM #__store_channels WHERE id = ? AND tenant_id = ? LIMIT 1',
@@ -234,6 +237,11 @@ final class ChannelsApiController extends ApiController
 
     public function toggle(): void
     {
+
+        if (!$this->canManageChannels()) {
+            return;
+        }
+        
         $id = (int) $this->app->request->input('id', 0);
         $enabled = $this->app->request->input('enabled', null);
         $row = $this->app->db->query(
