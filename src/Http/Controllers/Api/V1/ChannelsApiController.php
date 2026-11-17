@@ -128,15 +128,20 @@ final class ChannelsApiController extends ApiController
 
         // OAuth: return authorize URL for the client to open
         if ($connector !== null && $connector->supportsOAuth() && $connector->isConfigured()) {
+
             $statePayload = [
                 'channel_id' => $id,
                 'tenant_id'  => $this->tenantId(),
                 'provider'   => $connector->key(),
-                'nonce'      => bin2hex(random_bytes(8)),
+                'nonce'      => bin2hex(random_bytes(16)),
                 'exp'        => time() + 900,
             ];
-            $state = rtrim(strtr(base64_encode(json_encode($statePayload, JSON_UNESCAPED_UNICODE)), '+/', '-_'), '=');
+
+            $state = bin2hex(random_bytes(32));
+
             $this->app->session->set('oauth_state', $state);
+            $this->app->session->set('oauth_state_payload', $statePayload);
+
             $this->app->db->query(
                 'UPDATE #__store_channels SET settings = ? WHERE id = ? AND tenant_id = ?',
                 [json_encode($settings, JSON_UNESCAPED_UNICODE), $id, $this->tenantId()]
