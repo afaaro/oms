@@ -1,0 +1,7 @@
+{
+  "key": "classic",
+  "label": "Classic",
+  "description": "StoreFeeder blue with amber brand accents.",
+  "swatch": ["#00539d", "#006fd1", "#f8991d"],
+  "order": 10
+}

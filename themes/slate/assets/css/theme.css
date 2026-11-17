@@ -1,0 +1,16 @@
+html[data-theme="slate"] {
+  --sf-ink: #111827;
+  --sf-muted: #6b7280;
+  --sf-line: #d1d5db;
+  --sf-bg: #eef1f4;
+  --sf-panel: #ffffff;
+  --sf-header: #1f2937;
+  --sf-platform-header: #111827;
+  --sf-primary: #475569;
+  --sf-primary-dark: #334155;
+  --sf-brand: #94a3b8;
+  --sf-success: #15803d;
+  --sf-error: #b91c1c;
+  --sf-side: #e8ecf1;
+  --sf-flyout: #1f2937;
+}

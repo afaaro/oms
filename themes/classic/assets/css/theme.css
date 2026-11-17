@@ -1,0 +1,21 @@
+/* Classic — default StoreFeeder look */
+:root,
+html[data-theme="classic"] {
+  --sf-ink: #0e222e;
+  --sf-muted: #64748b;
+  --sf-line: #dee3e7;
+  --sf-bg: #f3f4f5;
+  --sf-panel: #ffffff;
+  --sf-header: #00539d;
+  --sf-platform-header: #0a3a6e;
+  --sf-primary: #006fd1;
+  --sf-primary-dark: #0058a8;
+  --sf-brand: #f8991d;
+  --sf-success: #359e2e;
+  --sf-error: #d10000;
+  --sf-side: #f3f4f5;
+  --sf-flyout: #0e222e;
+  --sf-font: Mulish, "Segoe UI", sans-serif;
+  --sf-radius: 4px;
+  --sf-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

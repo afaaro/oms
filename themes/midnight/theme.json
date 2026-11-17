@@ -1,0 +1,7 @@
+{
+  "key": "midnight",
+  "label": "Midnight",
+  "description": "Full dark workspace for low-light desks.",
+  "swatch": ["#0b1220", "#1e293b", "#38bdf8"],
+  "order": 60
+}

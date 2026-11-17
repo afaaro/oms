@@ -1,0 +1,16 @@
+html[data-theme="ocean"] {
+  --sf-ink: #083344;
+  --sf-muted: #5b7c8a;
+  --sf-line: #cfe3ea;
+  --sf-bg: #eef7f9;
+  --sf-panel: #ffffff;
+  --sf-header: #0b4f6c;
+  --sf-platform-header: #073b52;
+  --sf-primary: #0ea5a4;
+  --sf-primary-dark: #0f766e;
+  --sf-brand: #38bdf8;
+  --sf-success: #059669;
+  --sf-error: #dc2626;
+  --sf-side: #e6f3f6;
+  --sf-flyout: #0b4f6c;
+}

@@ -1,0 +1,7 @@
+{
+  "key": "amber",
+  "label": "Amber Night",
+  "description": "Navy shell with strong amber CTAs.",
+  "swatch": ["#111827", "#1e3a5f", "#f59e0b"],
+  "order": 50
+}

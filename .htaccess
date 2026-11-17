@@ -1,0 +1,22 @@
+DirectoryIndex index.php
+
+# Pretty URLs (IONOS / Apache 2.4)
+<IfModule mod_dir.c>
+    FallbackResource /index.php
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    RewriteCond %{HTTP:X-Api-Key} .
+    RewriteRule ^ - [E=HTTP_X_API_KEY:%{HTTP:X-Api-Key}]
+
+    # Relative target so a subdirectory install (WAMP /storefeeder) and a
+    # document-root install (IONOS) both reach this folder's index.php.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>

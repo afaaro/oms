@@ -1,0 +1,16 @@
+html[data-theme="forest"] {
+  --sf-ink: #14261c;
+  --sf-muted: #5f7366;
+  --sf-line: #d5e0d8;
+  --sf-bg: #eef3ef;
+  --sf-panel: #ffffff;
+  --sf-header: #1b4332;
+  --sf-platform-header: #081c15;
+  --sf-primary: #2d6a4f;
+  --sf-primary-dark: #1b4332;
+  --sf-brand: #d4a017;
+  --sf-success: #40916c;
+  --sf-error: #b42318;
+  --sf-side: #e7eee9;
+  --sf-flyout: #1b4332;
+}

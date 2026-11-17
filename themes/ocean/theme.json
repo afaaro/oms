@@ -1,0 +1,7 @@
+{
+  "key": "ocean",
+  "label": "Ocean",
+  "description": "Deep teal header with bright aqua accents.",
+  "swatch": ["#0b4f6c", "#0ea5a4", "#38bdf8"],
+  "order": 20
+}

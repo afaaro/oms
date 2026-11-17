@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS `store_conversations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int unsigned NOT NULL,
+  `channel_id` int unsigned NOT NULL,
+  `external_id` varchar(64) NOT NULL,
+  `conversation_type` varchar(32) NOT NULL DEFAULT 'FROM_MEMBERS',
+  `status` varchar(32) NOT NULL DEFAULT 'ACTIVE',
+  `reference_id` varchar(64) NOT NULL DEFAULT '',
+  `reference_type` varchar(32) NOT NULL DEFAULT '',
+  `unread_count` int unsigned NOT NULL DEFAULT 0,
+  `latest_message_id` varchar(64) NOT NULL DEFAULT '',
+  `latest_body` varchar(1000) NOT NULL DEFAULT '',
+  `latest_sender` varchar(128) NOT NULL DEFAULT '',
+  `latest_date` datetime DEFAULT NULL,
+  `synced_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sf_conv_channel_external` (`channel_id`, `external_id`),
+  KEY `idx_sf_conv_tenant` (`tenant_id`),
+  KEY `idx_sf_conv_channel_status` (`channel_id`, `status`),
+  KEY `idx_sf_conv_latest` (`latest_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `store_conversation_messages` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int unsigned NOT NULL,
+  `channel_id` int unsigned NOT NULL,
+  `conversation_id` varchar(64) NOT NULL,
+  `external_id` varchar(64) NOT NULL,
+  `sender` varchar(128) NOT NULL DEFAULT '',
+  `recipient` varchar(128) NOT NULL DEFAULT '',
+  `body` mediumtext NOT NULL,
+  `read_status` tinyint(1) NOT NULL DEFAULT 0,
+  `created_date` datetime DEFAULT NULL,
+  `synced_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sf_cmsg_channel_external` (`channel_id`, `external_id`),
+  KEY `idx_sf_cmsg_tenant` (`tenant_id`),
+  KEY `idx_sf_cmsg_thread` (`channel_id`, `conversation_id`),
+  KEY `idx_sf_cmsg_created` (`created_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

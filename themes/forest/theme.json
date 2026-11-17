@@ -1,0 +1,7 @@
+{
+  "key": "forest",
+  "label": "Forest",
+  "description": "Evergreen panels with warm gold highlights.",
+  "swatch": ["#1b4332", "#2d6a4f", "#d4a017"],
+  "order": 30
+}
