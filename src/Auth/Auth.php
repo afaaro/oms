@@ -87,7 +87,7 @@ final class Auth
 
         $this->session->remove('api_token_id');
         $this->session->remove('api_token_scopes');
-        
+
         $this->session->remove('active_tenant_id');
         $this->session->remove('impersonate_tenant_id');
         $this->session->remove('impersonate_return_tenant_id');
@@ -201,6 +201,33 @@ final class Auth
         $this->resolved = true;
         $this->aclCache = null;
         return true;
+    }
+
+    public function apiTokenAllowsScope(string $scope): bool
+    {
+        if ((int) $this->session->get('api_token_id', 0) <= 0) {
+            return true;
+        }
+
+        $raw = trim((string) $this->session->get('api_token_scopes', ''));
+
+        if ($raw === '*') {
+            return true;
+        }
+
+        if ($raw === '') {
+            return false;
+        }
+
+        $scopes = array_map('trim', explode(',', $raw));
+
+        if (in_array($scope, $scopes, true)) {
+            return true;
+        }
+
+        $prefix = explode(':', $scope, 2)[0] . ':*';
+
+        return in_array($prefix, $scopes, true);
     }
 
     /**
