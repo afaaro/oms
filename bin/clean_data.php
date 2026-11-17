@@ -10,6 +10,21 @@ declare(strict_types=1);
  */
 
 require dirname(__DIR__) . '/bootstrap/autoload.php';
+$email = trim($argv[1] ?? '');
+$password = $argv[2] ?? '';
+
+if (
+    $email === ''
+    || !filter_var($email, FILTER_VALIDATE_EMAIL)
+    || strlen($password) < 12
+) {
+    fwrite(
+        STDERR,
+        "Usage: php bin/clean_data.php <email> <password>\n"
+        . "Password must be at least 12 characters.\n"
+    );
+    exit(1);
+}
 
 $base = dirname(__DIR__);
 $app = new App\Core\App($base);
@@ -78,21 +93,6 @@ $pdo->exec(
 );
 
 // Platform admin (can open Platform + Open as tenant)
-$email = trim($argv[1] ?? '');
-$password = $argv[2] ?? '';
-
-if (
-    $email === ''
-    || !filter_var($email, FILTER_VALIDATE_EMAIL)
-    || strlen($password) < 12
-) {
-    fwrite(
-        STDERR,
-        "Usage: php bin/clean_data.php <email> <password>\n"
-        . "Password must be at least 12 characters.\n"
-    );
-    exit(1);
-}
 
 $hash = password_hash($password, PASSWORD_DEFAULT);
 $hasPlatform = (bool) $pdo->query("SHOW COLUMNS FROM users LIKE 'is_platform'")->fetch();
