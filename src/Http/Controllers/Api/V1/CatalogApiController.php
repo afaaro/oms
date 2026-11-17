@@ -58,6 +58,9 @@ final class CatalogApiController extends ApiController
 
     public function productStore(): void
     {
+        if (!$this->requireScope('catalog:write')) {
+            return;
+        }
         $sku = trim((string) $this->app->request->input('sku', ''));
         $name = trim((string) $this->app->request->input('name', ''));
         if ($sku === '' || $name === '') {
@@ -95,6 +98,9 @@ final class CatalogApiController extends ApiController
 
     public function productUpdate(): void
     {
+        if (!$this->requireScope('catalog:write')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         if ($id <= 0) {
             $this->fail('id required', 422);
@@ -154,6 +160,9 @@ final class CatalogApiController extends ApiController
 
     public function inventorySet(): void
     {
+        if (!$this->requireScope('catalog:write')) {
+            return;
+        }
         $sku = trim((string) $this->app->request->input('sku', ''));
         $productId = (int) $this->app->request->input('product_id', 0);
         $qty = (int) $this->app->request->input('qty_on_hand', $this->app->request->input('qty', 0));
@@ -212,6 +221,9 @@ final class CatalogApiController extends ApiController
 
     public function listingMap(): void
     {
+        if (!$this->requireScope('catalog:write')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $productId = (int) $this->app->request->input('product_id', 0);
         if ($id <= 0 || $productId <= 0) {
