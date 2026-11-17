@@ -233,12 +233,36 @@ final class Auth
     /**
      * Issue a new API token for a user/tenant. Returns the plaintext token once.
      */
+
     public function issueApiToken(int $userId, int $tenantId, string $name = 'api', string $scopes = ''): string
     {
+        $allowedScopes = [
+            'orders:read', 'orders:write',
+            'catalog:read', 'catalog:write',
+            'customers:read', 'customers:write',
+            'users:read',
+            'channels:read', 'channels:manage',
+            'warehouse:read', 'warehouse:manage',
+            'shipping:read', 'shipping:manage',
+            'reports:read',
+            'messages:read', 'messages:manage',
+        ];
+
+        $scopeList = array_values(array_unique(array_filter(
+            array_map('trim', explode(',', $scopes))
+        )));
+
+        if ($scopeList === [] || array_diff($scopeList, $allowedScopes) !== []) {
+            throw new \InvalidArgumentException('Valid API token scopes are required.');
+        }
+
+        $scopes = implode(',', $scopeList);
+
         $plain = 'sf_' . bin2hex(random_bytes(24));
+
         $this->db->query(
             'INSERT INTO #__store_api_tokens (tenant_id, user_id, name, token_hash, token_prefix, scopes)
-             VALUES (?, ?, ?, ?, ?, ?)',
+            VALUES (?, ?, ?, ?, ?, ?)',
             [
                 $tenantId,
                 $userId,
@@ -248,6 +272,7 @@ final class Auth
                 $scopes,
             ]
         );
+
         return $plain;
     }
 
