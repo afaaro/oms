@@ -10,6 +10,9 @@ final class InsightsApiController extends ApiController
 {
     public function dashboard(): void
     {
+        if (!$this->requireScope('reports:read')) {
+            return;
+        }
         $tid = $this->tenantId();
         $ordersToday = (int) ($this->app->db->query(
             'SELECT COUNT(*) AS c FROM #__store_orders WHERE tenant_id = ? AND DATE(created_at) = CURDATE()',
@@ -48,6 +51,9 @@ final class InsightsApiController extends ApiController
 
     public function salesSummary(): void
     {
+        if (!$this->requireScope('reports:read')) {
+            return;
+        }
         $days = max(1, min(90, (int) $this->app->request->get('days', 7)));
         $rows = $this->app->db->query(
             "SELECT DATE(created_at) AS day,
