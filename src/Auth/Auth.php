@@ -233,7 +233,7 @@ final class Auth
     /**
      * Issue a new API token for a user/tenant. Returns the plaintext token once.
      */
-    public function issueApiToken(int $userId, int $tenantId, string $name = 'api', string $scopes = '*'): string
+    public function issueApiToken(int $userId, int $tenantId, string $name = 'api', string $scopes = ''): string
     {
         $plain = 'sf_' . bin2hex(random_bytes(24));
         $this->db->query(
