@@ -39,14 +39,14 @@ $existing = $db->query(
 if ($existing !== []) {
     $db->query(
         'UPDATE store_api_tokens SET token_hash=?, token_prefix=?, tenant_id=1, scopes=?, expires_at=NULL, revoked_at=NULL WHERE id=?',
-        [$hash, $prefix, '*', (int) $existing['id']]
+        [$hash, $prefix, 'orders:read', (int) $existing['id']]
     );
     echo "rotated demo token for user #{$user['id']}\n";
 } else {
     $db->query(
         'INSERT INTO store_api_tokens (tenant_id, user_id, name, token_hash, token_prefix, scopes)
          VALUES (1, ?, ?, ?, ?, ?)',
-        [(int) $user['id'], 'demo', $hash, $prefix, '*']
+        [(int) $user['id'], 'demo', $hash, $prefix, 'orders:read']
     );
     echo "created demo token for user #{$user['id']}\n";
 }
