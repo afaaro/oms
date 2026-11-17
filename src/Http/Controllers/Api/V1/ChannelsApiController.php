@@ -105,6 +105,9 @@ final class ChannelsApiController extends ApiController
 
     public function connect(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $channel = $this->app->db->query(
             'SELECT * FROM #__store_channels WHERE id = ? AND tenant_id = ? LIMIT 1',
