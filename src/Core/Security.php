@@ -13,15 +13,11 @@ final class Security
 
     public function isHttps(): bool
     {
-        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        if (isset($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off' && $_SERVER['HTTPS'] !== '') {
             return true;
         }
-        $proto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
-        if ($proto === 'https') {
-            return true;
-        }
-        $port = (int) ($_SERVER['SERVER_PORT'] ?? 0);
-        return $port === 443;
+
+        return (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443;
     }
 
     public function enforceHttps(): void
