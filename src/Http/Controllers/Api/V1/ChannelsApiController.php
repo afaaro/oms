@@ -26,6 +26,9 @@ final class ChannelsApiController extends ApiController
 
     public function index(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $type = trim((string) $this->app->request->get('type', ''));
         $provider = trim((string) $this->app->request->get('provider', ''));
         $params = [$this->tenantId()];
@@ -54,6 +57,9 @@ final class ChannelsApiController extends ApiController
 
     public function show(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $row = $this->app->db->query(
             'SELECT id, code, name, type, active, settings, created_at, updated_at
@@ -69,6 +75,9 @@ final class ChannelsApiController extends ApiController
 
     public function catalog(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $registry = new ConnectorRegistry($this->app);
         $providers = [];
         foreach (IntegrationCatalog::providers() as $p) {
@@ -88,6 +97,9 @@ final class ChannelsApiController extends ApiController
 
     public function connectors(): void
     {
+        if (!$this->canManageChannels()) {
+            return;
+        }
         $registry = new ConnectorRegistry($this->app);
         $out = [];
         foreach ($registry->all() as $c) {
