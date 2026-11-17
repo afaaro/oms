@@ -68,6 +68,10 @@ final class Auth
     {
         session_regenerate_id(true);
         $this->session->set('user_id', (int) $user['id']);
+
+        $this->session->remove('api_token_id');
+        $this->session->remove('api_token_scopes');
+
         $this->session->remove('impersonate_tenant_id');
         $this->session->remove('impersonate_return_tenant_id');
         $tenantId = $this->resolvePrimaryTenantId((int) $user['id'], !empty($user['is_platform']));
@@ -80,6 +84,10 @@ final class Auth
     public function logout(): void
     {
         $this->session->remove('user_id');
+
+        $this->session->remove('api_token_id');
+        $this->session->remove('api_token_scopes');
+        
         $this->session->remove('active_tenant_id');
         $this->session->remove('impersonate_tenant_id');
         $this->session->remove('impersonate_return_tenant_id');
@@ -179,7 +187,7 @@ final class Auth
         $this->session->set('active_tenant_id', (int) $row['tenant_id']);
         $this->session->set('api_token_id', (int) $row['id']);
         $this->session->set('api_token_scopes', (string) ($row['scopes'] ?? '*'));
-        
+
         $this->user = [
             'id'            => (int) $row['user_id'],
             'email'         => $row['email'],
