@@ -33,6 +33,15 @@ final class OAuthController extends Controller
         $channelId = (int) ($payload['channel_id'] ?? 0);
         $tenantId = (int) ($payload['tenant_id'] ?? 0);
         $provider = (string) ($payload['provider'] ?? '');
+        $userId = $this->app->auth->id();
+
+        if (
+            $userId === null
+            || !$this->app->auth->userBelongsToTenant($userId, $tenantId)
+        ) {
+            $this->failAndRedirect('You are not authorised to connect this channel.');
+            return;
+        }
 
         if ($tenantId > 0) {
             $this->app->tenant->setActive($tenantId);
