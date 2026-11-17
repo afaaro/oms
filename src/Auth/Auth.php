@@ -186,7 +186,7 @@ final class Auth
         $this->session->set('user_id', (int) $row['user_id']);
         $this->session->set('active_tenant_id', (int) $row['tenant_id']);
         $this->session->set('api_token_id', (int) $row['id']);
-        $this->session->set('api_token_scopes', (string) ($row['scopes'] ?? '*'));
+        $this->session->set('api_token_scopes', (string) ($row['scopes'] ?? ''));
 
         $this->user = [
             'id'            => (int) $row['user_id'],
