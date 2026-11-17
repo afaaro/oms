@@ -16,6 +16,9 @@ final class MessagesApiController extends ApiController
 {
     public function index(): void
     {
+        if (!$this->requireScope('messages:read')) {
+            return;
+        }
         $params = [$this->tenantId()];
         $where = 'm.tenant_id = ?';
         $status = trim((string) $this->app->request->get('status', ''));
@@ -61,6 +64,9 @@ final class MessagesApiController extends ApiController
 
     public function show(): void
     {
+        if (!$this->requireScope('messages:read')) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $row = $this->app->db->query(
             'SELECT m.*, c.name AS channel_name, c.code AS channel_code
@@ -78,6 +84,9 @@ final class MessagesApiController extends ApiController
 
     public function sync(): void
     {
+        if (!$this->requireScope('messages:manage')) {
+            return;
+        }
         $days = max(1, min(30, (int) $this->app->request->input('days', 14)));
         $folder = (string) $this->app->request->input('folder', 'mail');
         if ($folder === 'message') {
@@ -91,6 +100,9 @@ final class MessagesApiController extends ApiController
 
     public function updateStatus(): void
     {
+        if (!$this->requireScope('messages:manage')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $status = (string) $this->app->request->input('status', '');
         if ($id <= 0 || !in_array($status, ['unread', 'open', 'replied', 'closed'], true)) {
@@ -106,6 +118,9 @@ final class MessagesApiController extends ApiController
 
     public function conversations(): void
     {
+        if (!$this->requireScope('messages:read')) {
+            return;
+        }
         $channelId = (int) $this->app->request->get('channel_id', 0);
         $rows = (new ConversationRepository($this->app->db))->listForTenant(
             $this->tenantId(),
@@ -117,6 +132,9 @@ final class MessagesApiController extends ApiController
 
     public function conversationReply(): void
     {
+        if (!$this->requireScope('messages:manage')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $body = trim((string) $this->app->request->input('body', ''));
         if ($id <= 0 || $body === '') {
@@ -160,6 +178,9 @@ final class MessagesApiController extends ApiController
 
     public function cases(): void
     {
+        if (!$this->requireScope('messages:read')) {
+            return;
+        }
         $channelId = (int) $this->app->request->get('channel_id', 0);
         $kind = trim((string) $this->app->request->get('kind', ''));
         $status = trim((string) $this->app->request->get('status', ''));
