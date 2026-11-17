@@ -11,6 +11,9 @@ final class ShippingApiController extends ApiController
 {
     public function methods(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, name, carrier, service_code, active, created_at
              FROM #__store_shipping_methods WHERE tenant_id = ? ORDER BY name',
@@ -21,6 +24,9 @@ final class ShippingApiController extends ApiController
 
     public function regions(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT id, name, countries, postcode_prefixes, active, created_at
              FROM #__store_shipping_regions WHERE tenant_id = ? ORDER BY name',
@@ -36,6 +42,9 @@ final class ShippingApiController extends ApiController
 
     public function rules(): void
     {
+        if (!$this->requireScope('shipping:read')) {
+            return;
+        }
         $rows = $this->app->db->query(
             'SELECT r.id, r.name, r.priority, r.active, r.channel_id, r.region_id, r.method_id,
                     r.match_shipping_method, r.weight_min_g, r.weight_max_g, r.created_at,
@@ -53,6 +62,9 @@ final class ShippingApiController extends ApiController
 
     public function test(): void
     {
+        if (!$this->requireScope('shipping:manage')) {
+            return;
+        }
         $payload = [
             'country' => strtoupper(trim((string) $this->app->request->input('country', 'GB'))),
             'postcode' => trim((string) $this->app->request->input('postcode', '')),
