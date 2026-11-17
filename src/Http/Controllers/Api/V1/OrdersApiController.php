@@ -11,6 +11,9 @@ final class OrdersApiController extends ApiController
 {
     public function index(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $tenantId = $this->tenantId();
         $params = [$tenantId];
         $where = 'o.tenant_id = ?';
@@ -61,6 +64,9 @@ final class OrdersApiController extends ApiController
 
     public function show(): void
     {
+        if (!$this->requireScope('orders:read')) {
+            return;
+        }
         $id = (int) $this->app->request->get('id', 0);
         $order = $this->app->db->query(
             'SELECT o.*, c.name AS channel_name, c.code AS channel_code
@@ -82,6 +88,9 @@ final class OrdersApiController extends ApiController
 
     public function store(): void
     {
+        if (!$this->requireScope('orders:write')) {
+            return;
+        }
         $body = $this->app->request->allPost();
         $channelId = (int) ($body['channel_id'] ?? 0);
         $email = trim((string) ($body['buyer_email'] ?? ''));
@@ -160,6 +169,9 @@ final class OrdersApiController extends ApiController
 
     public function updateStatus(): void
     {
+        if (!$this->requireScope('orders:write')) {
+            return;
+        }
         $id = (int) $this->app->request->input('id', 0);
         $status = (string) $this->app->request->input('status', '');
         $allowed = [
@@ -205,6 +217,9 @@ final class OrdersApiController extends ApiController
 
     public function despatch(): void
     {
+        if (!$this->requireScope('orders:write')) {
+            return;
+        }
         $ids = $this->app->request->input('order_ids', []);
         if (!is_array($ids)) {
             $ids = [];
