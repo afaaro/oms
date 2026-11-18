@@ -306,7 +306,7 @@ final class CatalogApiController extends ApiController
         $rows = $this->app->db->query(
             'SELECT po.id, po.reference, po.status, po.total, po.expected_at, s.name AS supplier_name
              FROM #__store_purchase_orders po
-             LEFT JOIN #__store_suppliers s ON s.id = po.supplier_id
+             LEFT JOIN #__store_suppliers s ON s.id = po.supplier_id AND s.tenant_id = po.tenant_id
              WHERE po.tenant_id = ?
              ORDER BY po.id DESC
              LIMIT 100',
