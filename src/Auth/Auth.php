@@ -224,10 +224,8 @@ final class Auth
         if (in_array($scope, $scopes, true)) {
             return true;
         }
-
-        $prefix = explode(':', $scope, 2)[0] . ':*';
-
-        return in_array($prefix, $scopes, true);
+        
+        return in_array($scope, $scopes, true);
     }
 
     /**
