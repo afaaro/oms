@@ -121,6 +121,10 @@ final class Router
 
         if ($route['auth']) {
             $isApi = str_starts_with($path, 'api/');
+            // API tokens must not authenticate browser/admin routes.
+            if (!$isApi && (int) $app->session->get('api_token_id', 0) > 0) {
+                $app->auth->logout();
+            }
 
             // Revalidate API-token sessions on every protected API request.
             if ($isApi && !$app->auth->validateApiTokenSession()) {
