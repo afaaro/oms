@@ -211,10 +211,6 @@ final class Auth
 
         $raw = trim((string) $this->session->get('api_token_scopes', ''));
 
-        if ($raw === '*') {
-            return true;
-        }
-
         if ($raw === '') {
             return false;
         }
@@ -224,7 +220,7 @@ final class Auth
         if (in_array($scope, $scopes, true)) {
             return true;
         }
-        
+
         return in_array($scope, $scopes, true);
     }
 
