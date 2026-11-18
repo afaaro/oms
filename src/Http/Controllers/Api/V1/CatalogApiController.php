@@ -224,17 +224,54 @@ final class CatalogApiController extends ApiController
         if (!$this->requireScope('catalog:write')) {
             return;
         }
+
         $id = (int) $this->app->request->input('id', 0);
         $productId = (int) $this->app->request->input('product_id', 0);
+        $tenantId = $this->tenantId();
+
         if ($id <= 0 || $productId <= 0) {
             $this->fail('id and product_id required', 422);
             return;
         }
+
+        $listing = $this->app->db->query(
+            'SELECT id
+            FROM #__store_listings
+            WHERE id = ? AND tenant_id = ?
+            LIMIT 1',
+            [$id, $tenantId]
+        )->row;
+
+        if ($listing === []) {
+            $this->fail('Listing not found', 404);
+            return;
+        }
+
+        $product = $this->app->db->query(
+            'SELECT id
+            FROM #__store_products
+            WHERE id = ? AND tenant_id = ?
+            LIMIT 1',
+            [$productId, $tenantId]
+        )->row;
+
+        if ($product === []) {
+            $this->fail('Product not found', 404);
+            return;
+        }
+
         $this->app->db->query(
-            'UPDATE #__store_listings SET product_id = ?, mapped = 1 WHERE id = ? AND tenant_id = ?',
-            [$productId, $id, $this->tenantId()]
+            'UPDATE #__store_listings
+            SET product_id = ?, mapped = 1
+            WHERE id = ? AND tenant_id = ?',
+            [$productId, $id, $tenantId]
         );
-        $this->ok(['id' => $id, 'product_id' => $productId, 'mapped' => true]);
+
+        $this->ok([
+            'id' => $id,
+            'product_id' => $productId,
+            'mapped' => true,
+        ]);
     }
 
     public function categories(): void
