@@ -77,7 +77,7 @@ final class OrdersDataset
         $filtered = (int) ($this->db->query(
             "SELECT COUNT(*) AS c
              FROM #__store_orders o
-             LEFT JOIN #__store_channels c ON c.id = o.channel_id
+             LEFT JOIN #__store_channels c ON c.id = o.channel_id AND c.tenant_id = o.tenant_id
              WHERE {$where}",
             $params
         )->row['c'] ?? 0);
@@ -159,7 +159,7 @@ final class OrdersDataset
                     o.shipping_name, c.name AS channel_name, c.code AS channel_code, c.type AS channel_type
                     {$pickingSelect}
              FROM #__store_orders o
-             LEFT JOIN #__store_channels c ON c.id = o.channel_id
+             LEFT JOIN #__store_channels c ON c.id = o.channel_id AND c.tenant_id = o.tenant_id
              WHERE {$where}
              ORDER BY {$orderBy} {$req->orderDir}, o.id DESC
              LIMIT {$req->length} OFFSET {$req->start}",
