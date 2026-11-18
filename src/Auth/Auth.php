@@ -217,10 +217,6 @@ final class Auth
 
         $scopes = array_map('trim', explode(',', $raw));
 
-        if (in_array($scope, $scopes, true)) {
-            return true;
-        }
-
         return in_array($scope, $scopes, true);
     }
 
