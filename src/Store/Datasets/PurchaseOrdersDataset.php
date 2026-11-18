@@ -32,7 +32,7 @@ final class PurchaseOrdersDataset
         $filtered = (int) ($this->db->query(
             "SELECT COUNT(*) AS c
              FROM #__store_purchase_orders p
-             LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id
+             LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id AND s.tenant_id = p.tenant_id
              WHERE {$where}",
             $params
         )->row['c'] ?? 0);
@@ -43,7 +43,7 @@ final class PurchaseOrdersDataset
         $rows = $this->db->query(
             "SELECT p.*, s.name AS supplier_name
              FROM #__store_purchase_orders p
-             LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id
+             LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id AND s.tenant_id = p.tenant_id
              WHERE {$where}
              ORDER BY {$orderBy} {$req->orderDir}
              LIMIT {$req->length} OFFSET {$req->start}",
