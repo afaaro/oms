@@ -119,23 +119,31 @@ final class Router
 
         $app->security->assertCsrfIfRequired($path, $method);
 
-        if ($route['auth'] && !$app->auth->check()) {
+        if ($route['auth']) {
             $isApi = str_starts_with($path, 'api/');
-            if ($isApi && $app->auth->attemptApiToken($app->request->bearerToken())) {
-                // ok via API token
-            } elseif ($isApi) {
-                http_response_code(401);
-                header('Content-Type: application/json; charset=utf-8');
-                header('WWW-Authenticate: Bearer');
-                echo json_encode([
-                    'error'   => 'Unauthorized',
-                    'message' => 'Valid API token required (Authorization: Bearer or X-Api-Key).',
-                ], JSON_UNESCAPED_UNICODE);
-                return;
-            } else {
-                $app->session->set('redirect_after_login', $path);
-                $app->redirect((string) $app->config->get('app.login_route', 'login'));
-                return;
+
+            // Revalidate API-token sessions on every protected API request.
+            if ($isApi && !$app->auth->validateApiTokenSession()) {
+                // Invalid token session has been cleared.
+            }
+
+            if (!$app->auth->check()) {
+                if ($isApi && $app->auth->attemptApiToken($app->request->bearerToken())) {
+                    // Authenticated via API token.
+                } elseif ($isApi) {
+                    http_response_code(401);
+                    header('Content-Type: application/json; charset=utf-8');
+                    header('WWW-Authenticate: Bearer');
+                    echo json_encode([
+                        'error'   => 'Unauthorized',
+                        'message' => 'Valid API token required (Authorization: Bearer or X-Api-Key).',
+                    ], JSON_UNESCAPED_UNICODE);
+                    return;
+                } else {
+                    $app->session->set('redirect_after_login', $path);
+                    $app->redirect((string) $app->config->get('app.login_route', 'login'));
+                    return;
+                }
             }
         }
 
