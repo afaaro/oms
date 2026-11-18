@@ -203,6 +203,59 @@ final class Auth
         return true;
     }
 
+    /**
+     * Revalidate an API-token-backed session against the database.
+     * Regular browser sessions are not affected.
+     */
+    public function validateApiTokenSession(): bool
+    {
+        $tokenId = (int) $this->session->get('api_token_id', 0);
+
+        if ($tokenId <= 0) {
+            return true;
+        }
+
+        $userId = (int) $this->session->get('user_id', 0);
+        $tenantId = (int) $this->session->get('active_tenant_id', 0);
+
+        $row = $this->db->query(
+            'SELECT t.id, t.user_id, t.tenant_id, t.scopes, t.expires_at, t.revoked_at,
+                    u.status
+            FROM #__store_api_tokens t
+            INNER JOIN #__users u ON u.id = t.user_id
+            WHERE t.id = ? AND t.user_id = ? AND t.tenant_id = ?
+            LIMIT 1',
+            [$tokenId, $userId, $tenantId]
+        )->row;
+
+        $valid = $row !== []
+            && (string) ($row['status'] ?? '') === 'active'
+            && empty($row['revoked_at']);
+
+        if ($valid && !empty($row['expires_at'])) {
+            $expiresAt = strtotime((string) $row['expires_at']);
+            $valid = $expiresAt !== false && $expiresAt >= time();
+        }
+
+        if (!$valid) {
+            $this->session->remove('user_id');
+            $this->session->remove('active_tenant_id');
+            $this->session->remove('api_token_id');
+            $this->session->remove('api_token_scopes');
+
+            $this->user = null;
+            $this->resolved = true;
+            $this->aclCache = null;
+
+            return false;
+        }
+
+        // Always use the latest scopes stored in the database.
+        $this->session->set('api_token_scopes', (string) ($row['scopes'] ?? ''));
+
+        return true;
+    }
+
     public function apiTokenAllowsScope(string $scope): bool
     {
         if ((int) $this->session->get('api_token_id', 0) <= 0) {
