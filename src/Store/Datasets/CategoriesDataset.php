@@ -36,7 +36,9 @@ final class CategoriesDataset
 
         $rows = $this->db->query(
             "SELECT c.id, c.name, c.active, c.created_at,
-                    (SELECT COUNT(*) FROM #__store_products p WHERE p.category_id = c.id) AS product_count
+                    (SELECT COUNT(*) FROM #__store_products p
+                        WHERE p.category_id = c.id
+                        AND p.tenant_id = c.tenant_id) AS product_count
              FROM #__store_categories c
              WHERE {$where}
              ORDER BY c.name ASC
