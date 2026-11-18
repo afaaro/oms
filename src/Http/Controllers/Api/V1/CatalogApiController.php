@@ -199,18 +199,30 @@ final class CatalogApiController extends ApiController
         if (!$this->requireScope('catalog:write')) {
             return;
         }
+
         $sku = trim((string) $this->app->request->input('sku', ''));
         $productId = (int) $this->app->request->input('product_id', 0);
-        $qty = (int) $this->app->request->input('qty_on_hand', $this->app->request->input('qty', 0));
+        $locationId = (int) $this->app->request->input('location_id', 0);
+        $qty = (int) $this->app->request->input(
+            'qty_on_hand',
+            $this->app->request->input('qty', 0)
+        );
+
+        $tenantId = $this->tenantId();
+
         if ($productId <= 0 && $sku !== '') {
             $p = $this->app->db->query(
-                'SELECT id FROM #__store_products WHERE tenant_id = ? AND sku = ? LIMIT 1',
-                [$this->tenantId(), $sku]
+                'SELECT id FROM #__store_products
+                WHERE tenant_id = ? AND sku = ?
+                LIMIT 1',
+                [$tenantId, $sku]
             )->row;
+
             $productId = (int) ($p['id'] ?? 0);
         }
-        if ($productId <= 0) {
-            $this->fail('product_id or sku required', 422);
+
+        if ($productId <= 0 || $locationId <= 0) {
+            $this->fail('product_id (or sku) and location_id are required', 422);
             return;
         }
 
@@ -218,7 +230,7 @@ final class CatalogApiController extends ApiController
             'SELECT id FROM #__store_products
             WHERE id = ? AND tenant_id = ?
             LIMIT 1',
-            [$productId, $this->tenantId()]
+            [$productId, $tenantId]
         )->row;
 
         if ($product === []) {
@@ -226,19 +238,46 @@ final class CatalogApiController extends ApiController
             return;
         }
 
-        $inv = $this->app->db->query(
-            'SELECT id FROM #__store_inventory WHERE tenant_id = ? AND product_id = ? LIMIT 1',
-            [$this->tenantId(), $productId]
+        $location = $this->app->db->query(
+            'SELECT id FROM #__store_stock_locations
+            WHERE id = ? AND tenant_id = ?
+            LIMIT 1',
+            [$locationId, $tenantId]
         )->row;
+
+        if ($location === []) {
+            $this->fail('Stock location not found', 404);
+            return;
+        }
+
+        $inv = $this->app->db->query(
+            'SELECT id FROM #__store_inventory
+            WHERE tenant_id = ? AND product_id = ? AND location_id = ?
+            LIMIT 1',
+            [$tenantId, $productId, $locationId]
+        )->row;
+
         if ($inv === []) {
             $this->app->db->query(
-                'INSERT INTO #__store_inventory (tenant_id, product_id, qty_on_hand) VALUES (?, ?, ?)',
-                [$this->tenantId(), $productId, $qty]
+                'INSERT INTO #__store_inventory
+                (tenant_id, product_id, location_id, qty_on_hand, updated_at)
+                VALUES (?, ?, ?, ?, NOW())',
+                [$tenantId, $productId, $locationId, $qty]
             );
         } else {
-            $this->app->db->query('UPDATE #__store_inventory SET qty_on_hand = ? WHERE id = ?', [$qty, $inv['id']]);
+            $this->app->db->query(
+                'UPDATE #__store_inventory
+                SET qty_on_hand = ?, updated_at = NOW()
+                WHERE id = ? AND tenant_id = ?',
+                [$qty, $inv['id'], $tenantId]
+            );
         }
-        $this->ok(['product_id' => $productId, 'qty_on_hand' => $qty]);
+
+        $this->ok([
+            'product_id' => $productId,
+            'location_id' => $locationId,
+            'qty_on_hand' => $qty,
+        ]);
     }
 
     public function listings(): void
