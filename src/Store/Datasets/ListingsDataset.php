@@ -37,8 +37,12 @@ final class ListingsDataset
         $filtered = (int) ($this->db->query(
             "SELECT COUNT(*) AS c
              FROM #__store_listings l
-             LEFT JOIN #__store_channels c ON c.id = l.channel_id
-             LEFT JOIN #__store_products p ON p.id = l.product_id
+            LEFT JOIN #__store_channels c
+                ON c.id = l.channel_id
+                AND c.tenant_id = l.tenant_id
+            LEFT JOIN #__store_products p
+                ON p.id = l.product_id
+                AND p.tenant_id = l.tenant_id
              WHERE {$where}",
             $params
         )->row['c'] ?? 0);
@@ -46,8 +50,12 @@ final class ListingsDataset
         $rows = $this->db->query(
             "SELECT l.*, c.name AS channel_name, p.sku AS product_sku, p.name AS product_name
              FROM #__store_listings l
-             LEFT JOIN #__store_channels c ON c.id = l.channel_id
-             LEFT JOIN #__store_products p ON p.id = l.product_id
+            LEFT JOIN #__store_channels c
+                ON c.id = l.channel_id
+                AND c.tenant_id = l.tenant_id
+            LEFT JOIN #__store_products p
+                ON p.id = l.product_id
+                AND p.tenant_id = l.tenant_id
              WHERE {$where}
              ORDER BY l.mapped ASC, l.id DESC
              LIMIT {$req->length} OFFSET {$req->start}",
