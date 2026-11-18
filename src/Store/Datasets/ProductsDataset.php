@@ -172,56 +172,120 @@ final class ProductsDataset
             return [];
         }
 
+        $inventoryJoin = '
+            LEFT JOIN (
+                SELECT
+                    tenant_id,
+                    product_id,
+                    SUM(qty_on_hand) AS qty_on_hand,
+                    SUM(qty_allocated) AS qty_allocated
+                FROM #__store_inventory
+                GROUP BY tenant_id, product_id
+            ) own ON own.product_id = p.id
+                AND own.tenant_id = p.tenant_id
+
+            LEFT JOIN #__store_products src
+                ON src.id = p.inventory_source_id
+                AND src.tenant_id = p.tenant_id
+
+            LEFT JOIN (
+                SELECT
+                    tenant_id,
+                    product_id,
+                    SUM(qty_on_hand) AS qty_on_hand,
+                    SUM(qty_allocated) AS qty_allocated
+                FROM #__store_inventory
+                GROUP BY tenant_id, product_id
+            ) src_inv ON src_inv.product_id = src.id
+                AND src_inv.tenant_id = src.tenant_id
+        ';
+
         try {
             return $this->db->query(
-                "SELECT p.id, p.sku, p.name, p.brand, p.price, p.active, p.barcode, p.mpn,
-                        p.warehouse, p.image, p.supplier_sku, p.supplier_name, p.supplier_id, p.parent_id,
-                        COALESCE(s.name, p.supplier_name, '') AS supplier_label,
-                        p.inventory_source_id, p.inventory_unit_factor,
-                        src.sku AS inventory_source_sku,
-                        CASE
-                          WHEN p.inventory_source_id IS NOT NULL AND p.inventory_source_id > 0 THEN
-                            FLOOR(COALESCE(src_inv.qty_on_hand, 0) / NULLIF(p.inventory_unit_factor, 0))
-                          ELSE COALESCE(own.qty_on_hand, 0)
-                        END AS qty_on_hand,
-                        CASE
-                          WHEN p.inventory_source_id IS NOT NULL AND p.inventory_source_id > 0 THEN
-                            FLOOR(COALESCE(src_inv.qty_allocated, 0) / NULLIF(p.inventory_unit_factor, 0))
-                          ELSE COALESCE(own.qty_allocated, 0)
-                        END AS qty_allocated
-                 FROM #__store_products p
-                 LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id AND s.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_inventory own ON own.product_id = p.id AND own.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_products src ON src.id = p.inventory_source_id AND src.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_inventory src_inv ON src_inv.product_id = src.id AND src_inv.tenant_id = p.tenant_id
-                 WHERE p.tenant_id=? AND p.parent_id=?
-                 ORDER BY p.sku ASC",
+                "SELECT
+                    p.id, p.sku, p.name, p.brand, p.price, p.active,
+                    p.barcode, p.mpn, p.warehouse, p.image,
+                    p.supplier_sku, p.supplier_name, p.supplier_id,
+                    p.parent_id,
+                    COALESCE(s.name, p.supplier_name, '') AS supplier_label,
+                    p.inventory_source_id,
+                    p.inventory_unit_factor,
+                    src.sku AS inventory_source_sku,
+
+                    CASE
+                        WHEN p.inventory_source_id IS NOT NULL
+                            AND p.inventory_source_id > 0 THEN
+                            FLOOR(
+                                COALESCE(src_inv.qty_on_hand, 0)
+                                / NULLIF(p.inventory_unit_factor, 0)
+                            )
+                        ELSE COALESCE(own.qty_on_hand, 0)
+                    END AS qty_on_hand,
+
+                    CASE
+                        WHEN p.inventory_source_id IS NOT NULL
+                            AND p.inventory_source_id > 0 THEN
+                            FLOOR(
+                                COALESCE(src_inv.qty_allocated, 0)
+                                / NULLIF(p.inventory_unit_factor, 0)
+                            )
+                        ELSE COALESCE(own.qty_allocated, 0)
+                    END AS qty_allocated
+
+                FROM #__store_products p
+
+                LEFT JOIN #__store_suppliers s
+                    ON s.id = p.supplier_id
+                    AND s.tenant_id = p.tenant_id
+
+                {$inventoryJoin}
+
+                WHERE p.tenant_id = ?
+                AND p.parent_id = ?
+
+                ORDER BY p.sku ASC",
                 [$tenantId, $parentId]
             )->rows;
+
         } catch (\Throwable) {
-            // Fallback without allocated if the column is missing on the host.
-            $rows = $this->db->query(
-                "SELECT p.id, p.sku, p.name, p.brand, p.price, p.active, p.barcode, p.mpn,
-                        p.warehouse, p.image, p.supplier_sku, p.supplier_name, p.supplier_id, p.parent_id,
-                        COALESCE(s.name, p.supplier_name, '') AS supplier_label,
-                        p.inventory_source_id, p.inventory_unit_factor,
-                        src.sku AS inventory_source_sku,
-                        CASE
-                          WHEN p.inventory_source_id IS NOT NULL AND p.inventory_source_id > 0 THEN
-                            FLOOR(COALESCE(src_inv.qty_on_hand, 0) / NULLIF(p.inventory_unit_factor, 0))
-                          ELSE COALESCE(own.qty_on_hand, 0)
-                        END AS qty_on_hand,
-                        0 AS qty_allocated
-                 FROM #__store_products p
-                 LEFT JOIN #__store_suppliers s ON s.id = p.supplier_id AND s.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_inventory own ON own.product_id = p.id AND own.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_products src ON src.id = p.inventory_source_id AND src.tenant_id = p.tenant_id
-                 LEFT JOIN #__store_inventory src_inv ON src_inv.product_id = src.id AND src_inv.tenant_id = p.tenant_id
-                 WHERE p.tenant_id=? AND p.parent_id=?
-                 ORDER BY p.sku ASC",
+            // Fallback without qty_allocated if the column is unavailable.
+            return $this->db->query(
+                "SELECT
+                    p.id, p.sku, p.name, p.brand, p.price, p.active,
+                    p.barcode, p.mpn, p.warehouse, p.image,
+                    p.supplier_sku, p.supplier_name, p.supplier_id,
+                    p.parent_id,
+                    COALESCE(s.name, p.supplier_name, '') AS supplier_label,
+                    p.inventory_source_id,
+                    p.inventory_unit_factor,
+                    src.sku AS inventory_source_sku,
+
+                    CASE
+                        WHEN p.inventory_source_id IS NOT NULL
+                            AND p.inventory_source_id > 0 THEN
+                            FLOOR(
+                                COALESCE(src_inv.qty_on_hand, 0)
+                                / NULLIF(p.inventory_unit_factor, 0)
+                            )
+                        ELSE COALESCE(own.qty_on_hand, 0)
+                    END AS qty_on_hand,
+
+                    0 AS qty_allocated
+
+                FROM #__store_products p
+
+                LEFT JOIN #__store_suppliers s
+                    ON s.id = p.supplier_id
+                    AND s.tenant_id = p.tenant_id
+
+                {$inventoryJoin}
+
+                WHERE p.tenant_id = ?
+                AND p.parent_id = ?
+
+                ORDER BY p.sku ASC",
                 [$tenantId, $parentId]
             )->rows;
-            return $rows;
         }
     }
 }
