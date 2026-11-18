@@ -72,6 +72,24 @@ final class CatalogApiController extends ApiController
             $this->fail('SKU already exists', 409);
             return;
         }
+
+        $categoryId = (int) $this->app->request->input('category_id', 0);
+        $categoryId = $categoryId > 0 ? $categoryId : null;
+
+        if ($categoryId !== null) {
+            $category = $this->app->db->query(
+                'SELECT id FROM #__store_categories
+                WHERE id = ? AND tenant_id = ?
+                LIMIT 1',
+                [$categoryId, $this->tenantId()]
+            )->row;
+
+            if ($category === []) {
+                $this->fail('Category not found', 404);
+                return;
+            }
+        }
+
         $ins = $this->app->db->query(
             'INSERT INTO #__store_products
              (tenant_id, sku, name, brand, category_id, description, barcode, warehouse, price, rrp, cost, weight_grams, active, notes)
@@ -81,7 +99,7 @@ final class CatalogApiController extends ApiController
                 $sku,
                 $name,
                 trim((string) $this->app->request->input('brand', '')),
-                (int) $this->app->request->input('category_id', 0) ?: null,
+                $categoryId,
                 trim((string) $this->app->request->input('description', '')),
                 trim((string) $this->app->request->input('barcode', '')),
                 'Default',
