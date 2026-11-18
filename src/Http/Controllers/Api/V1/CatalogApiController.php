@@ -124,6 +124,24 @@ final class CatalogApiController extends ApiController
             $this->fail('id required', 422);
             return;
         }
+
+        $categoryId = (int) $this->app->request->input('category_id', 0);
+        $categoryId = $categoryId > 0 ? $categoryId : null;
+
+        if ($categoryId !== null) {
+            $category = $this->app->db->query(
+                'SELECT id FROM #__store_categories
+                WHERE id = ? AND tenant_id = ?
+                LIMIT 1',
+                [$categoryId, $this->tenantId()]
+            )->row;
+
+            if ($category === []) {
+                $this->fail('Category not found', 404);
+                return;
+            }
+        }
+
         $this->app->db->query(
             'UPDATE #__store_products
              SET name=?, brand=?, category_id=?, description=?, barcode=?, price=?, rrp=?, cost=?, weight_grams=?, active=?
@@ -131,7 +149,7 @@ final class CatalogApiController extends ApiController
             [
                 trim((string) $this->app->request->input('name', '')),
                 trim((string) $this->app->request->input('brand', '')),
-                (int) $this->app->request->input('category_id', 0) ?: null,
+                $categoryId,
                 trim((string) $this->app->request->input('description', '')),
                 trim((string) $this->app->request->input('barcode', '')),
                 (float) $this->app->request->input('price', 0),
