@@ -33,7 +33,7 @@ final class DropshipsDataset
         $filtered = (int) ($this->db->query(
             "SELECT COUNT(*) AS c
              FROM #__store_dropships d
-             LEFT JOIN #__store_suppliers s ON s.id = d.supplier_id
+             LEFT JOIN #__store_suppliers s ON s.id = d.supplier_id AND s.tenant_id = d.tenant_id
              WHERE {$where}",
             $params
         )->row['c'] ?? 0);
@@ -41,8 +41,8 @@ final class DropshipsDataset
         $rows = $this->db->query(
             "SELECT d.*, s.name AS supplier_name, o.external_order_id
              FROM #__store_dropships d
-             LEFT JOIN #__store_suppliers s ON s.id = d.supplier_id
-             LEFT JOIN #__store_orders o ON o.id = d.order_id
+             LEFT JOIN #__store_suppliers s ON s.id = d.supplier_id AND s.tenant_id = d.tenant_id
+             LEFT JOIN #__store_orders o ON o.id = d.order_id AND o.tenant_id = d.tenant_id
              WHERE {$where}
              ORDER BY d.id DESC
              LIMIT {$req->length} OFFSET {$req->start}",
