@@ -213,6 +213,19 @@ final class CatalogApiController extends ApiController
             $this->fail('product_id or sku required', 422);
             return;
         }
+
+        $product = $this->app->db->query(
+            'SELECT id FROM #__store_products
+            WHERE id = ? AND tenant_id = ?
+            LIMIT 1',
+            [$productId, $this->tenantId()]
+        )->row;
+
+        if ($product === []) {
+            $this->fail('Product not found', 404);
+            return;
+        }
+
         $inv = $this->app->db->query(
             'SELECT id FROM #__store_inventory WHERE tenant_id = ? AND product_id = ? LIMIT 1',
             [$this->tenantId(), $productId]
